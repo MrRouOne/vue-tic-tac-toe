@@ -32,59 +32,184 @@ Vue.component('todo-item', {
                 len = app.size
             }
 
-            // столбец ↓
+            // столбец 
             for (let i = 0; i < app.size; i++) {
-                count = 0
-                for (let j = 0; j < app.size; j++) {
-                    if (arr[i][j] != value) {
+                if (len < app.size) {
+                    for (let j = 0; j <= app.size - len; j++) {
+                        count = 0
+                        for (let k = 0; k < len; k++) {
+                            if (arr[i][j + k] != value) {
+                                break
+                            }
+                            count++
+                        }
+                        if (count == len) {
+                            app.win = 'yes'
+                            break
+                        }
+                    }
+                } else {
+                    for (let j = 0; j < len; j++) {
+                        if (arr[i][j] != value) {
+                            break
+                        }
+                        count++
+                    }
+                    if (count == len) {
+                        app.win = 'yes'
                         break
                     }
-                    count++
-                }
-                if (count == len) {
-                    app.win = 'yes'
-                    break
                 }
             }
 
 
             // строка
+            count = 0
             for (let i = 0; i < app.size; i++) {
-                isRow = true
-                for (let j = 0; j < app.size; j++) {
-                    if (arr[j][i] != value) {
-                        isRow = false
+                if (len < app.size) {
+                    for (let j = 0; j <= app.size - len; j++) {
+                        count = 0
+                        for (let k = 0; k < len; k++) {
+                            if (arr[j + k][i] != value) {
+                                break
+                            }
+                            count++
+                        }
+                        if (count == len) {
+                            app.win = 'yes'
+                            break
+                        }
+                    }
+                } else {
+                    for (let j = 0; j < len; j++) {
+                        if (arr[j][i] != value) {
+                            break
+                        }
+                        count++
+                    }
+                    if (count == len) {
+                        app.win = 'yes'
                         break
                     }
                 }
-                if (isRow) {
+            }
+
+            // основная диагональ вниз
+            count = 0
+            if (len < app.size) {
+                for (let y = 0; y < app.size - 4; y++) {
+                    count = 0
+                    for (let j = 0; j <= app.size - len; j++) {
+                        count = 0
+                        for (let i = 0; i < len; i++) {
+                            if (arr[i + j][i + j + y] != value) {
+
+                                break
+                            }
+
+                            count++
+                        }
+                        if (count == len) {
+                            count = 0
+                            app.win = 'yes'
+                        }
+                    }
+                }
+            } else {
+                for (let i = 0; i < app.size; i++) {
+
+                    if (arr[i][i] != value) {
+                        break
+                    }
+                    count++
+                }
+                if (count == len) {
+                    count = 0
                     app.win = 'yes'
-                    break
+
                 }
             }
 
-            // основная диагональ
-            for (let i = 0; i < app.size; i++) {
-                isRow = true
-                if (arr[i][i] != value) {
-                    isRow = false
-                    break
+            // основная диагональ вверх
+            count = 0
+            if (len < app.size) {
+                for (let y = 0; y < app.size - 4; y++) {
+                    count = 0
+                    for (let j = 0; j <= app.size - len; j++) {
+                        count = 0
+                        for (let i = 0; i < len; i++) {
+                            if (arr[i + y][i + j] != value) {
+                                break
+                            }
+
+                            count++
+                        }
+                        if (count == len) {
+                            count = 0
+                            app.win = 'yes'
+                        }
+                    }
                 }
-            }
-            if (isRow) {
-                app.win = 'yes'
             }
 
-            // побочная диагональ
-            for (let i = 0; i < app.size; i++) {
-                isRow = true
-                if (arr[app.size - i - 1][i] != value) {
-                    isRow = false
-                    break
+            // побочная диагональ вниз
+            count = 0
+            if (len < app.size) {
+                for (let y = 0; y < app.size - 4; y++) {
+                    count = 0
+                    for (let j = 0; j <= app.size - len; j++) {
+                        count = 0
+                        for (let i = 0; i < len; i++) {
+                            if (arr[app.size - 1 - i - j][i + j + y] != value) {
+
+                                break
+                            }
+                            count++
+                        }
+                        if (count == len) {
+                            count = 0
+                            app.win = 'yes'
+                        }
+                    }
+                }
+            } else {
+                for (let i = 0; i < app.size; i++) {
+
+                    if (arr[app.size - i - 1][i] != value) {
+                        break
+                    }
+                    count++
+                }
+                if (count == len) {
+                    count = 0
+                    app.win = 'yes'
+
                 }
             }
-            if (isRow) {
-                app.win = 'yes'
+
+
+            // побочная диагональ вверх
+            count = 0
+            if (len < app.size) {
+                for (let y = 0; y < app.size - 4; y++) {
+                    count = 0
+                    for (let j = 0; j <= app.size - len; j++) {
+                        count = 0
+                        for (let i = 0; i < len; i++) {
+
+                            if (arr[app.size - 1 - i - j - y][i + j] != value) {
+                                console.log(app.size - 1 - i - j - y,i + j)
+                                break
+                            }
+                          
+                            count++
+                        }
+                        if (count == len) {
+                            count = 0
+                            app.win = 'yes'
+                        }
+                    }
+                }
             }
         }
     }
@@ -101,7 +226,7 @@ const app = new Vue({
         showCurrentPlayer: false,
         showInputName: false,
         showSize: false, //true
-        size: '7', // ''
+        size: '8', // ''
         styleField: "",
         showGameField: false,
         gameField: [],
@@ -141,7 +266,7 @@ const app = new Vue({
                         this.gameField[i][j] = '';
                     }
                 }
-                this.showGameField = true // !
+                this.showGameField = true
                 this.height = this.size * 100 + 'px'
                 this.currentPlayer = this.firstPlayer
                 this.showCurrentPlayer = true
