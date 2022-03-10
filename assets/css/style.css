@@ -14,6 +14,7 @@
 }
 
 .game_field {
+    height: auto;
     display: grid;
     background-color: black;
     align-self: center;

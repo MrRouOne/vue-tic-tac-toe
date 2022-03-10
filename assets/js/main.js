@@ -1,10 +1,44 @@
 Vue.component('todo-item', {
-    props: ['todo'],
+    props: ['i', 'j', 'cell'],
     data: function () {
         return {
+
         }
     },
-    template: ``
+    template: `<div class="cell" @click ="setValue"><p>{{cell}}<p></div>`,
+
+    methods: {
+        setValue() {
+            if (this.cell == '') {
+                app.count++
+                if (app.count % 2 == 0) {
+                    this.cell = 'X'
+                    app.currentPlayer = app.secondPlayer
+                } else {
+                    this.cell = 'O'
+                    app.currentPlayer = app.firstPlayer
+                }
+                app.gameField[this.i][this.j] = this.cell
+                this.checkWin()
+            }
+        },
+        checkWin() {
+            let arr = app.gameField
+            let bool = false
+            let countX = 0
+            for (let i = 0; i < app.size; i++) {
+                  arr[i].forEach(element => {
+                      if (element == 'X' && index == 0) {
+                          countX++
+                      }
+                  });
+            }
+            if (countX == app.size) {
+                app.win = 'yes'
+            }
+           
+        }
+    }
 });
 
 const app = new Vue({
@@ -12,14 +46,19 @@ const app = new Vue({
     data: {
         message: '',
         header: 'Выберите размер поля',
-        firstPlayer: '',
-        secondPlayer: '',
+        firstPlayer: 'f',
+        secondPlayer: 's',
+        currentPlayer: '',
+        showCurrentPlayer: false,
         showInputName: false,
-        showSize: true,
-        size: '',
+        showSize: false, //true
+        size: '3', // ''
         styleField: "",
         showGameField: false,
-        gameField: []
+        gameField: [],
+        height: 0,
+        count: 1,
+        win: 'no'
     },
     methods: {
         playersName: function () {
@@ -41,19 +80,24 @@ const app = new Vue({
             this.styleField = "repeat(" + this.size + ", 1fr)"
         },
         fieldSize: function () {
-            if (this.size.trim() != '') { 
+            if (this.size.trim() != '') {
                 this.size = Number(this.size)
                 this.styleField = "repeat(" + this.size + ", 1fr)"
-                this.showInputName = true
+                // this.showInputName = true
                 this.showSize = false
                 this.header = 'Введите имя первого игрока'
-                for (let i=0;i<this.size;i++) {
+                for (let i = 0; i < this.size; i++) {
                     this.gameField[i] = [];
-                    for (let j=0;j<this.size;j++) {
+                    for (let j = 0; j < this.size; j++) {
                         this.gameField[i][j] = '';
                     }
                 }
+                this.showGameField = true // !
+                this.height = this.size * 100 + 'px'
+                this.currentPlayer = this.firstPlayer
+                this.showCurrentPlayer = true
             }
-        }
+        },
+
     }
 });
