@@ -19,24 +19,73 @@ Vue.component('todo-item', {
                     app.currentPlayer = app.firstPlayer
                 }
                 app.gameField[this.i][this.j] = this.cell
-                this.checkWin()
+                this.checkWin('X')
+                this.checkWin('O')
             }
         },
-        checkWin() {
+        checkWin(value) {
             let arr = app.gameField
-            let bool = false
-            let countX = 0
-            for (let i = 0; i < app.size; i++) {
-                  arr[i].forEach(element => {
-                      if (element == 'X' && index == 0) {
-                          countX++
-                      }
-                  });
+            let isRow
+            let count = 0
+            let len = 5
+            if (app.size < 5) {
+                len = app.size
             }
-            if (countX == app.size) {
+
+            // столбец ↓
+            for (let i = 0; i < app.size; i++) {
+                count = 0
+                for (let j = 0; j < app.size; j++) {
+                    if (arr[i][j] != value) {
+                        break
+                    }
+                    count++
+                }
+                if (count == len) {
+                    app.win = 'yes'
+                    break
+                }
+            }
+
+
+            // строка
+            for (let i = 0; i < app.size; i++) {
+                isRow = true
+                for (let j = 0; j < app.size; j++) {
+                    if (arr[j][i] != value) {
+                        isRow = false
+                        break
+                    }
+                }
+                if (isRow) {
+                    app.win = 'yes'
+                    break
+                }
+            }
+
+            // основная диагональ
+            for (let i = 0; i < app.size; i++) {
+                isRow = true
+                if (arr[i][i] != value) {
+                    isRow = false
+                    break
+                }
+            }
+            if (isRow) {
                 app.win = 'yes'
             }
-           
+
+            // побочная диагональ
+            for (let i = 0; i < app.size; i++) {
+                isRow = true
+                if (arr[app.size - i - 1][i] != value) {
+                    isRow = false
+                    break
+                }
+            }
+            if (isRow) {
+                app.win = 'yes'
+            }
         }
     }
 });
@@ -52,7 +101,7 @@ const app = new Vue({
         showCurrentPlayer: false,
         showInputName: false,
         showSize: false, //true
-        size: '3', // ''
+        size: '7', // ''
         styleField: "",
         showGameField: false,
         gameField: [],
