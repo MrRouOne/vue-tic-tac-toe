@@ -20,7 +20,11 @@
 <body>
     <div id="app">
         <div class="container mt-xl-3 d-flex align-items-center flex-column">
+
             <h1 class="text-center">{{header}}</h1>
+            <button style="margin-left: 100%;" class="btn mt-xl-3 btn-primary  btn-lg" @click="reset">Заново</button>
+
+
 
             <div class="mt-xl-4" v-if='showChoose'>
                 <button class="btn btn-primary btn-lg" @click="showSizeDuel">Дуэль</button>
@@ -39,19 +43,20 @@
                     <option>9</option>
                     <option>10</option>
                 </select>
-                <button class="btn mt-xl-3 btn-primary btn-lg" @click="fieldSize">Отправить</button>
+                <button class="btn mt-xl-3 btn-primary btn-lg" @click="chooseFieldSize">Отправить</button>
             </div>
 
             <div class="d-flex flex-column mt-xl-4" v-if='showInputName'>
-                <input class="form-control form-control-lg" type="text" v-model="message">
-                <button class="btn mt-xl-3 btn-primary  btn-lg" @click="playersName">Отправить</button>
+                <input class="form-control form-control-lg" type="text" v-model="inputName">
+                <button class="btn mt-xl-3 btn-primary  btn-lg" @click="setPlayersName">Отправить</button>
             </div>
 
             <h2 v-if='showGameField && !win' class=" mt-xl-4">Ход игрока {{currentPlayer}}</h2>
             <h1 v-if='showCurrentPlayer && winner' class=" mt-xl-4 text-danger">Победил игрок {{winner}}</h1>
             <h2 v-if='showDraw' class=" mt-xl-4">Ничья</h2>
+
             <div v-if='showGameField'
-                :style="{'grid-template-columns':styleField, 'grid-template-rows':styleField, 'height':height}"
+                :style="{'grid-template-columns':styleField, 'grid-template-rows':styleField, 'height':heightField}"
                 class="game_field mt-xl-5">
 
                 <div v-for="(n, i) in size">

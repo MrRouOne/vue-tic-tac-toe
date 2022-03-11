@@ -8,11 +8,7 @@ Vue.component('todo-item', {
     template: `<div class="cell" @click="setValue"><p>{{cell}}<p></div>`,
 
     methods: {
-        getRandomInt(max) {
-            return Math.floor(Math.random() * max);
-        },
         setValue() {
-
             if (app.win == true) {
                 return false
             }
@@ -21,16 +17,22 @@ Vue.component('todo-item', {
             }
 
             if (app.computer) {
-
                 this.cell = 'X'
                 app.gameField[this.i][this.j] = this.cell
+
                 app.currentPlayer = app.firstPlayer
+                app.checkWin('X');
+                if (app.win == true) {
+                    return false
+                }
 
                 let arr = app.gameField
                 let x, y
-                do {
-                    x = this.getRandomInt(app.size)
-                    y = this.getRandomInt(app.size)
+                let count = 0
+
+                while (1) {
+                    x = app.getRandomInt(app.size)
+                    y = app.getRandomInt(app.size)
 
                     if (arr[x][y] == '') {
                         app.currentPlayer = 'Компьютер'
@@ -38,291 +40,104 @@ Vue.component('todo-item', {
                         app.showGameField = false
                         app.showGameField = true
                         break;
+                    } else {
+                        count++
                     }
-                } while (1)
-                this.checkWin('O');
+                    if (count == Number(app.size) ** 2) {
+                        break
+                    }
+                }
+                app.checkWin('O');
                 app.currentPlayer = app.firstPlayer
-                this.checkWin('X');
 
-                if (!this.checkDraw()) {
+                if (!app.checkDraw()) {
                     app.win = true
                     app.showDraw = true
                 }
                 app.currentPlayer = app.firstPlayer
+
             } else {
                 app.count++
                 (app.count % 2 == 0) ? this.cell = 'X' : this.cell = 'O';
                 app.gameField[this.i][this.j] = this.cell
-                this.checkWin('X');
-                this.checkWin('O');
+                app.checkWin('X');
+                app.checkWin('O');
 
-                if (!this.checkDraw()) {
+                if (!app.checkDraw()) {
                     app.win = true
                     app.showDraw = true
                 }
                 (app.currentPlayer == app.firstPlayer) ? app.currentPlayer = app.secondPlayer : app.currentPlayer = app.firstPlayer;
             }
-
-
         },
-        checkWin(value) {
-            let arr = app.gameField
-            let len = 5
-            if (app.size < 5) {
-                len = app.size
-            }
-
-            // столбец 
-            let count = 0
-            for (let i = 0; i < app.size; i++) {
-                count = 0
-                if (len < app.size) {
-                    for (let j = 0; j <= app.size - len; j++) {
-                        count = 0
-                        for (let k = 0; k < len; k++) {
-                            if (arr[i][j + k] != value) {
-                                break
-                            }
-                            count++
-                        }
-                        if (count == len) {
-                            app.win = true; app.winner = app.currentPlayer
-                            break
-                        }
-                    }
-                } else {
-                    for (let j = 0; j < len; j++) {
-                        if (arr[i][j] != value) {
-                            break
-                        }
-
-                        count++
-                    }
-                    if (count == len) {
-                        app.win = true; app.winner = app.currentPlayer
-                        break
-                    }
-                }
-            }
-
-
-            // строка
-            let count2 = 0
-            for (let i = 0; i < app.size; i++) {
-                count2 = 0
-                if (len < app.size) {
-                    for (let j = 0; j <= app.size - len; j++) {
-                        count2 = 0
-                        for (let k = 0; k < len; k++) {
-                            if (arr[j + k][i] != value) {
-                                break
-                            }
-                            count2++
-                        }
-                        if (count2 == len) {
-                            app.win = true; app.winner = app.currentPlayer
-                            break
-                        }
-                    }
-                } else {
-                    for (let j = 0; j < len; j++) {
-                        if (arr[j][i] != value) {
-                            break
-                        }
-
-                        count2++
-                    }
-                    if (count2 == len) {
-
-                        app.win = true; app.winner = app.currentPlayer
-                        break
-                    }
-                }
-            }
-
-            // основная диагональ вниз
-            let count3 = 0
-            if (len < app.size) {
-                for (let y = 0; y < app.size - 4; y++) {
-                    count3 = 0
-                    for (let j = 0; j <= app.size - len; j++) {
-                        count3 = 0
-                        for (let i = 0; i < len; i++) {
-                            if (arr[i + j][i + j + y] != value) {
-
-                                break
-                            }
-
-                            count3++
-                        }
-                        if (count3 == len) {
-                            count3 = 0
-                            app.win = true; app.winner = app.currentPlayer
-                        }
-                    }
-                }
-            } else {
-                for (let i = 0; i < app.size; i++) {
-
-                    if (arr[i][i] != value) {
-                        break
-                    }
-                    count3++
-                }
-                if (count3 == len) {
-                    count3 = 0
-                    app.win = true; app.winner = app.currentPlayer
-
-                }
-            }
-
-            // основная диагональ вверх
-            let count4 = 0
-            if (len < app.size) {
-                for (let y = 0; y < app.size - 4; y++) {
-                    count4 = 0
-                    for (let j = 0; j <= app.size - len; j++) {
-                        count4 = 0
-                        for (let i = 0; i < len; i++) {
-                            if (arr[i + y][i + j] != value) {
-                                break
-                            }
-
-                            count4++
-                        }
-                        if (count4 == len) {
-                            count4 = 0
-                            app.win = true; app.winner = app.currentPlayer
-                        }
-                    }
-                }
-            }
-
-            // побочная диагональ вниз
-            let count5 = 0
-            if (len < app.size) {
-                for (let y = 0; y < app.size - 4; y++) {
-                    count5 = 0
-                    for (let j = 0; j <= app.size - len; j++) {
-                        count5 = 0
-                        for (let i = 0; i < len; i++) {
-                            if (arr[app.size - 1 - i - j][i + j + y] != value) {
-
-                                break
-                            }
-                            count5++
-                        }
-                        if (count5 == len) {
-                            count5 = 0
-                            app.win = true; app.winner = app.currentPlayer
-                        }
-                    }
-                }
-            } else {
-                for (let i = 0; i < app.size; i++) {
-
-                    if (arr[app.size - i - 1][i] != value) {
-                        break
-                    }
-                    count5++
-                }
-                if (count5 == len) {
-                    count5 = 0
-                    app.win = true; app.winner = app.currentPlayer
-
-                }
-            }
-
-
-            // побочная диагональ вверх
-            let count6 = 0
-            if (len < app.size) {
-                for (let y = 0; y < app.size - 4; y++) {
-                    count6 = 0
-                    for (let j = 0; j < app.size - len; j++) {
-                        count6 = 0
-                        for (let i = 0; i < len; i++) {
-                            if (arr[app.size - 1 - i - j - y][i + j] != value) {
-
-                                break
-                            }
-
-                            count6++
-                        }
-                        if (count6 == len) {
-                            count6 = 0
-                            app.win = true; app.winner = app.currentPlayer; app.winner = app.currentPlayer
-                        }
-                    }
-                }
-            }
-        },
-        checkDraw() {
-            if (app.winner != false) {
-                return true
-            }
-            let arr = app.gameField
-            count = 0
-            for (let i = 0; i < app.size; i++) {
-                for (let j = 0; j < app.size; j++) {
-                    if (arr[i][j] == '') {
-                        count++
-                    }
-
-                }
-            }
-            if (count == 0) {
-                return false
-            }
-            return true
-        }
     }
 });
 
 const app = new Vue({
     el: '#app',
     data: {
-        message: '',
-        header: 'Выберите режим игры поля',
-        firstPlayer: '',
-        secondPlayer: '',
-        currentPlayer: '',
+        showChoose: true,
         showCurrentPlayer: false,
         showInputName: false,
         showSize: false,
-        size: '',
-        styleField: "",
+        showDraw: false,
         showGameField: false,
-        gameField: [],
-        height: 0,
-        count: 1,
+        header: 'Выберите режим игры поля',
+        inputName: '',
+        firstPlayer: '',
+        secondPlayer: '',
+        currentPlayer: '',
+        computer: false,
         win: false,
         winner: false,
-        showDraw: false,
-        showChoose: true,
-        computer: false
+        gameField: [],
+        heightField: 0,
+        styleField: "",
+        size: '',
+        count: 1,
+
     },
     methods: {
-        playersName: function () {
+        reset: function () {
+            this.showChoose = true,
+                this.showCurrentPlayer = false,
+                this.showInputName = false,
+                this.showSize = false,
+                this.showDraw = false,
+                this.showGameField = false,
+                this.header = 'Выберите режим игры поля',
+                this.inputName = '',
+                this.firstPlayer = '',
+                this.secondPlayer = '',
+                this.currentPlayer = '',
+                this.computer = false,
+                this.win = false,
+                this.winner = false,
+                this.gameField = [],
+                this.heightField = 0,
+                this.styleField = "",
+                this.size = '',
+                this.count = 1
+        },
+        setPlayersName: function () {
             if (this.computer) {
-                if (this.firstPlayer == '' && this.message.trim() != '') {
-                    this.firstPlayer = this.message
+                if (this.firstPlayer == '' && this.inputName.trim() != '') {
+                    this.firstPlayer = this.inputName
                     this.secondPlayer = 'Компьютер'
                     this.showInputName = false
                     this.showGameField = true
                     this.currentPlayer = this.firstPlayer
                     this.showCurrentPlayer = true
-                    this.message = ''
+                    this.inputName = ''
                     this.header = this.firstPlayer + " VS " + this.secondPlayer
                 }
-
             } else {
-                if (this.firstPlayer == '' && this.message.trim() != '') {
-                    this.firstPlayer = this.message
+                if (this.firstPlayer == '' && this.inputName.trim() != '') {
+                    this.firstPlayer = this.inputName
                     this.header = 'Введите имя второго игрока'
                 }
-                else if (this.secondPlayer == '' && this.message.trim() != '') {
-                    this.secondPlayer = this.message
+                else if (this.secondPlayer == '' && this.inputName.trim() != '') {
+                    this.secondPlayer = this.inputName
                     this.header = this.firstPlayer + " VS " + this.secondPlayer
                 }
 
@@ -332,10 +147,10 @@ const app = new Vue({
                     this.currentPlayer = this.firstPlayer
                     this.showCurrentPlayer = true
                 }
-                this.message = ''
+                this.inputName = ''
             }
         },
-        fieldSize: function () {
+        chooseFieldSize: function () {
             if (this.size.trim() != '') {
                 this.size = Number(this.size)
                 this.styleField = "repeat(" + this.size + ", 1fr)"
@@ -349,7 +164,7 @@ const app = new Vue({
                         this.gameField[i][j] = '';
                     }
                 }
-                this.height = this.size * 100 + 'px'
+                this.heightField = this.size * 100 + 'px'
             }
         },
         showSizeDuel: function () {
@@ -362,7 +177,68 @@ const app = new Vue({
             this.showChoose = false
             this.header = 'Выбирете размер поля'
             this.computer = true
-        }
+        },
+        checkWin(value) {
+            let arr = app.gameField
+            let len = 5
+            if (app.size < 5) { len = app.size }
+            this.checkMatrix(value, arr, app.size, len, 'row')
+            this.checkMatrix(value, arr, app.size, len, 'column')
+            this.checkMatrix(value, arr, app.size, len, 'mainDiagonal', 'down')
+            this.checkMatrix(value, arr, app.size, len, 'mainDiagonal', 'up')
+            this.checkMatrix(value, arr, app.size, len, 'secondaryDiagonal', 'down')
+            this.checkMatrix(value, arr, app.size, len, 'secondaryDiagonal', 'up')
+        },
+        checkDraw() {
+            if (app.winner != false) {
+                return true
+            }
+            let arr = app.gameField
+            count = 0
+            for (let i = 0; i < app.size; i++) {
+                for (let j = 0; j < app.size; j++) {
+                    if (arr[i][j] == '') {
+                        count++
+                    }
+                }
+            }
+            if (count == 0) {
+                return false
+            }
+            return true
+        },
+        getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        },
+        checkMatrix(value, arr, size, len, type, direction) {
+            let cell = arr[0][0]
+            let yLimit = size - len
+            let count = 0
+            if (type == 'row' || type == 'column') { yLimit = size - 1 }
+            for (let y = 0; y <= yLimit; y++) {
+                count = 0
+                for (let j = 0; j <= size - len; j++) {
+                    count = 0
+                    for (let i = 0; i < len; i++) {
+                        if (type == 'row') { cell = arr[j + i][y] }
+                        if (type == 'column') { cell = arr[y][j + i] }
+                        if (type == 'mainDiagonal' && direction == 'down') { cell = arr[i + j][i + j + y] }
+                        if (type == 'mainDiagonal' && direction == 'up') { cell = arr[i + y][i + j] }
+                        if (type == 'secondaryDiagonal' && direction == 'down') { cell = [size - 1 - i - j][i + j + y] }
+                        if (type == 'secondaryDiagonal' && direction == 'up') { cell = arr[size - 1 - i - y][i + j] }
 
+                        if (cell != value) {
+                            break
+                        }
+                        count++
+                    }
+                    if (count == len) {
+                        app.win = true;
+                        app.winner = app.currentPlayer
+                    }
+                }
+            }
+        },
     }
+
 });
