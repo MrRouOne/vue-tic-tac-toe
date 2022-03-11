@@ -22,6 +22,11 @@
         <div class="container mt-xl-3 d-flex align-items-center flex-column">
             <h1 class="text-center">{{header}}</h1>
 
+            <div class="mt-xl-4" v-if='showChoose'>
+                <button class="btn btn-primary btn-lg" @click="showSizeDuel">Дуэль</button>
+                <button class="btn btn-primary btn-lg" @click="showSizeBot">Компьютер</button>
+            </div>
+
             <div class="mt-xl-4" v-if='showSize'>
                 <select class="form-select" v-model="size">
                     <option selected="" disabled="" value="">--------</option>
@@ -31,28 +36,32 @@
                     <option>6</option>
                     <option>7</option>
                     <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
                 </select>
-                <button class="btn mt-xl-3 btn-primary my_button btn-lg" @click="fieldSize">Отправить</button>
+                <button class="btn mt-xl-3 btn-primary btn-lg" @click="fieldSize">Отправить</button>
             </div>
-            <button class="btn mt-xl-3 btn-primary my_button btn-lg" @click="fieldSize">Отправить</button>
 
             <div class="d-flex flex-column mt-xl-4" v-if='showInputName'>
                 <input class="form-control form-control-lg" type="text" v-model="message">
-                <button class="btn mt-xl-3 btn-primary my_button btn-lg" @click="playersName">Отправить</button>
+                <button class="btn mt-xl-3 btn-primary  btn-lg" @click="playersName">Отправить</button>
             </div>
 
-           
-            <div v-if='showGameField' :style="{'grid-template-columns':styleField, 'grid-template-rows':styleField, 'height':height}"
+            <h2 v-if='showGameField && !win' class=" mt-xl-4">Ход игрока {{currentPlayer}}</h2>
+            <h1 v-if='showCurrentPlayer && winner' class=" mt-xl-4 text-danger">Победил игрок {{winner}}</h1>
+            <h2 v-if='showDraw' class=" mt-xl-4">Ничья</h2>
+            <div v-if='showGameField'
+                :style="{'grid-template-columns':styleField, 'grid-template-rows':styleField, 'height':height}"
                 class="game_field mt-xl-5">
-        
+
                 <div v-for="(n, i) in size">
                     <div v-for="(n, j) in size">
                         <todo-item v-bind:i="i" v-bind:j="j" v-bind:cell="gameField[i][j]"></todo-item>
                     </div>
                 </div>
             </div>
-            <h2 v-if='showCurrentPlayer' class=" mt-xl-4">Ход игрока {{currentPlayer}}</h2>
-            <p>{{win}}<p>
+
+
         </div>
     </div>
 </body>

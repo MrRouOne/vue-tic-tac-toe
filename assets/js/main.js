@@ -5,35 +5,77 @@ Vue.component('todo-item', {
 
         }
     },
-    template: `<div class="cell" @click ="setValue"><p>{{cell}}<p></div>`,
+    template: `<div class="cell" @click="setValue"><p>{{cell}}<p></div>`,
 
     methods: {
+        getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        },
         setValue() {
-            if (this.cell == '') {
-                app.count++
-                if (app.count % 2 == 0) {
-                    this.cell = 'X'
-                    app.currentPlayer = app.secondPlayer
-                } else {
-                    this.cell = 'O'
-                    app.currentPlayer = app.firstPlayer
-                }
-                app.gameField[this.i][this.j] = this.cell
-                this.checkWin('X')
-                this.checkWin('O')
+
+            if (app.win == true) {
+                return false
             }
+            if (this.cell != '') {
+                return false
+            }
+
+            if (app.computer) {
+
+                this.cell = 'X'
+                app.gameField[this.i][this.j] = this.cell
+                app.currentPlayer = app.firstPlayer
+
+                let arr = app.gameField
+                let x, y
+                do {
+                    x = this.getRandomInt(app.size)
+                    y = this.getRandomInt(app.size)
+
+                    if (arr[x][y] == '') {
+                        app.currentPlayer = 'Компьютер'
+                        app.gameField[x][y] = 'O'
+                        app.showGameField = false
+                        app.showGameField = true
+                        break;
+                    }
+                } while (1)
+                this.checkWin('O');
+                app.currentPlayer = app.firstPlayer
+                this.checkWin('X');
+
+                if (!this.checkDraw()) {
+                    app.win = true
+                    app.showDraw = true
+                }
+                app.currentPlayer = app.firstPlayer
+            } else {
+                app.count++
+                (app.count % 2 == 0) ? this.cell = 'X' : this.cell = 'O';
+                app.gameField[this.i][this.j] = this.cell
+                this.checkWin('X');
+                this.checkWin('O');
+
+                if (!this.checkDraw()) {
+                    app.win = true
+                    app.showDraw = true
+                }
+                (app.currentPlayer == app.firstPlayer) ? app.currentPlayer = app.secondPlayer : app.currentPlayer = app.firstPlayer;
+            }
+
+
         },
         checkWin(value) {
             let arr = app.gameField
-            let isRow
-            let count = 0
             let len = 5
             if (app.size < 5) {
                 len = app.size
             }
 
             // столбец 
+            let count = 0
             for (let i = 0; i < app.size; i++) {
+                count = 0
                 if (len < app.size) {
                     for (let j = 0; j <= app.size - len; j++) {
                         count = 0
@@ -44,7 +86,7 @@ Vue.component('todo-item', {
                             count++
                         }
                         if (count == len) {
-                            app.win = 'yes'
+                            app.win = true; app.winner = app.currentPlayer
                             break
                         }
                     }
@@ -53,10 +95,11 @@ Vue.component('todo-item', {
                         if (arr[i][j] != value) {
                             break
                         }
+
                         count++
                     }
                     if (count == len) {
-                        app.win = 'yes'
+                        app.win = true; app.winner = app.currentPlayer
                         break
                     }
                 }
@@ -64,19 +107,20 @@ Vue.component('todo-item', {
 
 
             // строка
-            count = 0
+            let count2 = 0
             for (let i = 0; i < app.size; i++) {
+                count2 = 0
                 if (len < app.size) {
                     for (let j = 0; j <= app.size - len; j++) {
-                        count = 0
+                        count2 = 0
                         for (let k = 0; k < len; k++) {
                             if (arr[j + k][i] != value) {
                                 break
                             }
-                            count++
+                            count2++
                         }
-                        if (count == len) {
-                            app.win = 'yes'
+                        if (count2 == len) {
+                            app.win = true; app.winner = app.currentPlayer
                             break
                         }
                     }
@@ -85,33 +129,35 @@ Vue.component('todo-item', {
                         if (arr[j][i] != value) {
                             break
                         }
-                        count++
+
+                        count2++
                     }
-                    if (count == len) {
-                        app.win = 'yes'
+                    if (count2 == len) {
+
+                        app.win = true; app.winner = app.currentPlayer
                         break
                     }
                 }
             }
 
             // основная диагональ вниз
-            count = 0
+            let count3 = 0
             if (len < app.size) {
                 for (let y = 0; y < app.size - 4; y++) {
-                    count = 0
+                    count3 = 0
                     for (let j = 0; j <= app.size - len; j++) {
-                        count = 0
+                        count3 = 0
                         for (let i = 0; i < len; i++) {
                             if (arr[i + j][i + j + y] != value) {
 
                                 break
                             }
 
-                            count++
+                            count3++
                         }
-                        if (count == len) {
-                            count = 0
-                            app.win = 'yes'
+                        if (count3 == len) {
+                            count3 = 0
+                            app.win = true; app.winner = app.currentPlayer
                         }
                     }
                 }
@@ -121,54 +167,54 @@ Vue.component('todo-item', {
                     if (arr[i][i] != value) {
                         break
                     }
-                    count++
+                    count3++
                 }
-                if (count == len) {
-                    count = 0
-                    app.win = 'yes'
+                if (count3 == len) {
+                    count3 = 0
+                    app.win = true; app.winner = app.currentPlayer
 
                 }
             }
 
             // основная диагональ вверх
-            count = 0
+            let count4 = 0
             if (len < app.size) {
                 for (let y = 0; y < app.size - 4; y++) {
-                    count = 0
+                    count4 = 0
                     for (let j = 0; j <= app.size - len; j++) {
-                        count = 0
+                        count4 = 0
                         for (let i = 0; i < len; i++) {
                             if (arr[i + y][i + j] != value) {
                                 break
                             }
 
-                            count++
+                            count4++
                         }
-                        if (count == len) {
-                            count = 0
-                            app.win = 'yes'
+                        if (count4 == len) {
+                            count4 = 0
+                            app.win = true; app.winner = app.currentPlayer
                         }
                     }
                 }
             }
 
             // побочная диагональ вниз
-            count = 0
+            let count5 = 0
             if (len < app.size) {
                 for (let y = 0; y < app.size - 4; y++) {
-                    count = 0
+                    count5 = 0
                     for (let j = 0; j <= app.size - len; j++) {
-                        count = 0
+                        count5 = 0
                         for (let i = 0; i < len; i++) {
                             if (arr[app.size - 1 - i - j][i + j + y] != value) {
 
                                 break
                             }
-                            count++
+                            count5++
                         }
-                        if (count == len) {
-                            count = 0
-                            app.win = 'yes'
+                        if (count5 == len) {
+                            count5 = 0
+                            app.win = true; app.winner = app.currentPlayer
                         }
                     }
                 }
@@ -178,39 +224,57 @@ Vue.component('todo-item', {
                     if (arr[app.size - i - 1][i] != value) {
                         break
                     }
-                    count++
+                    count5++
                 }
-                if (count == len) {
-                    count = 0
-                    app.win = 'yes'
+                if (count5 == len) {
+                    count5 = 0
+                    app.win = true; app.winner = app.currentPlayer
 
                 }
             }
 
 
             // побочная диагональ вверх
-            count = 0
+            let count6 = 0
             if (len < app.size) {
                 for (let y = 0; y < app.size - 4; y++) {
-                    count = 0
-                    for (let j = 0; j <= app.size - len; j++) {
-                        count = 0
+                    count6 = 0
+                    for (let j = 0; j < app.size - len; j++) {
+                        count6 = 0
                         for (let i = 0; i < len; i++) {
-
                             if (arr[app.size - 1 - i - j - y][i + j] != value) {
-                                console.log(app.size - 1 - i - j - y,i + j)
+
                                 break
                             }
-                          
-                            count++
+
+                            count6++
                         }
-                        if (count == len) {
-                            count = 0
-                            app.win = 'yes'
+                        if (count6 == len) {
+                            count6 = 0
+                            app.win = true; app.winner = app.currentPlayer; app.winner = app.currentPlayer
                         }
                     }
                 }
             }
+        },
+        checkDraw() {
+            if (app.winner != false) {
+                return true
+            }
+            let arr = app.gameField
+            count = 0
+            for (let i = 0; i < app.size; i++) {
+                for (let j = 0; j < app.size; j++) {
+                    if (arr[i][j] == '') {
+                        count++
+                    }
+
+                }
+            }
+            if (count == 0) {
+                return false
+            }
+            return true
         }
     }
 });
@@ -219,59 +283,86 @@ const app = new Vue({
     el: '#app',
     data: {
         message: '',
-        header: 'Выберите размер поля',
-        firstPlayer: 'f',
-        secondPlayer: 's',
+        header: 'Выберите режим игры поля',
+        firstPlayer: '',
+        secondPlayer: '',
         currentPlayer: '',
         showCurrentPlayer: false,
         showInputName: false,
-        showSize: false, //true
-        size: '8', // ''
+        showSize: false,
+        size: '',
         styleField: "",
         showGameField: false,
         gameField: [],
         height: 0,
         count: 1,
-        win: 'no'
+        win: false,
+        winner: false,
+        showDraw: false,
+        showChoose: true,
+        computer: false
     },
     methods: {
         playersName: function () {
-            if (this.firstPlayer == '' && this.message.trim() != '') {
-                this.firstPlayer = this.message
-                this.header = 'Введите имя второго игрока'
-            }
-            else if (this.secondPlayer == '' && this.message.trim() != '') {
-                this.secondPlayer = this.message
-                this.header = this.firstPlayer + " VS " + this.secondPlayer
-            }
+            if (this.computer) {
+                if (this.firstPlayer == '' && this.message.trim() != '') {
+                    this.firstPlayer = this.message
+                    this.secondPlayer = 'Компьютер'
+                    this.showInputName = false
+                    this.showGameField = true
+                    this.currentPlayer = this.firstPlayer
+                    this.showCurrentPlayer = true
+                    this.message = ''
+                    this.header = this.firstPlayer + " VS " + this.secondPlayer
+                }
 
-            if (this.firstPlayer != '' && this.secondPlayer != '') {
-                this.showInputName = false
-                this.showGameField = true
-            }
-            this.message = ''
+            } else {
+                if (this.firstPlayer == '' && this.message.trim() != '') {
+                    this.firstPlayer = this.message
+                    this.header = 'Введите имя второго игрока'
+                }
+                else if (this.secondPlayer == '' && this.message.trim() != '') {
+                    this.secondPlayer = this.message
+                    this.header = this.firstPlayer + " VS " + this.secondPlayer
+                }
 
-            this.styleField = "repeat(" + this.size + ", 1fr)"
+                if (this.firstPlayer != '' && this.secondPlayer != '') {
+                    this.showInputName = false
+                    this.showGameField = true
+                    this.currentPlayer = this.firstPlayer
+                    this.showCurrentPlayer = true
+                }
+                this.message = ''
+            }
         },
         fieldSize: function () {
             if (this.size.trim() != '') {
                 this.size = Number(this.size)
                 this.styleField = "repeat(" + this.size + ", 1fr)"
-                // this.showInputName = true
+                this.showInputName = true
                 this.showSize = false
-                this.header = 'Введите имя первого игрока'
+                if (this.computer) { this.header = 'Введите имя игрока' } else { this.header = 'Введите имя первого игрока' }
+
                 for (let i = 0; i < this.size; i++) {
                     this.gameField[i] = [];
                     for (let j = 0; j < this.size; j++) {
                         this.gameField[i][j] = '';
                     }
                 }
-                this.showGameField = true
                 this.height = this.size * 100 + 'px'
-                this.currentPlayer = this.firstPlayer
-                this.showCurrentPlayer = true
             }
         },
+        showSizeDuel: function () {
+            this.showSize = true
+            this.showChoose = false
+            this.header = 'Выбирете размер поля'
+        },
+        showSizeBot: function () {
+            this.showSize = true
+            this.showChoose = false
+            this.header = 'Выбирете размер поля'
+            this.computer = true
+        }
 
     }
 });
